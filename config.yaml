@@ -1,0 +1,32 @@
+# Training Configuration for Math LLM
+
+# Model settings
+model:
+  name: "distilgpt2"  # Options: distilgpt2, gpt2, gpt2-medium, TinyLlama/TinyLlama-1.1B-Chat-v1.0
+  max_length: 512
+
+# Dataset settings
+dataset:
+  train_path: "data/train.jsonl"
+  val_path: "data/val.jsonl"
+  test_path: "data/test.jsonl"
+  num_train_samples: 10000
+  num_val_samples: 1000
+  num_test_samples: 1000
+  max_number: 100
+
+# Training hyperparameters
+training:
+  num_epochs: 3
+  batch_size: 8
+  learning_rate: 2.0e-5
+  gradient_accumulation_steps: 4
+  warmup_steps: 500
+  save_steps: 1000
+  logging_steps: 100
+  output_dir: "output"
+
+# Evaluation settings
+evaluation:
+  batch_size: 16
+  num_samples: 100  # Number of samples to test for quick evaluation
