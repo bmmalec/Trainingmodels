@@ -56,15 +56,20 @@ class UIController {
                 playerItem.classList.add('active');
             }
 
+            const totalArmies = player.getTotalArmy();
+
             playerItem.innerHTML = `
                 <div>
                     <div style="color: ${player.color}; font-weight: bold;">${player.name}</div>
                     <div style="font-size: 0.85em; color: #999;">
                         ${player.territories.length} territories
                     </div>
+                    <div style="font-size: 0.85em; color: #ff6b6b;">
+                        ⚔️ ${totalArmies} armies
+                    </div>
                 </div>
-                <div>
-                    <div style="color: #ffd700;">${player.resources}💰</div>
+                <div style="text-align: right;">
+                    <div style="color: #ffd700; margin-bottom: 0.25rem;">${player.resources}💰</div>
                 </div>
             `;
 
