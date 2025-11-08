@@ -63,23 +63,45 @@ class Renderer {
 
         // Draw territory center with army indicator
         if (territory.army > 0) {
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 
-            // Draw background circle
+            // Draw background circle with shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
             ctx.beginPath();
-            ctx.arc(territory.center[0], territory.center[1], 12, 0, Math.PI * 2);
-            ctx.fillStyle = territory.owner ? Utils.darkenColor(territory.owner.color, 20) : '#333';
+            ctx.arc(territory.center[0], territory.center[1], 18, 0, Math.PI * 2);
+            ctx.fillStyle = territory.owner ? Utils.darkenColor(territory.owner.color, 30) : '#333';
             ctx.fill();
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.stroke();
 
-            // Draw army count
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Draw army count with larger, bolder font
+            ctx.font = 'bold 18px Arial';
             ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.strokeText(territory.army.toString(), territory.center[0], territory.center[1]);
             ctx.fillText(territory.army.toString(), territory.center[0], territory.center[1]);
+
+            // Draw territory name below army count
+            ctx.font = 'bold 10px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            const nameY = territory.center[1] + 26;
+            ctx.strokeText(territory.name, territory.center[0], nameY);
+            ctx.fillText(territory.name, territory.center[0], nameY);
         }
     }
 

@@ -187,12 +187,29 @@ aside {
 
 #instructions ul {
     list-style-position: inside;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #b8b8b8;
+    margin-left: 0.5rem;
 }
 
 #instructions li {
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
+    line-height: 1.4;
+}
+
+#instructions p {
+    font-size: 0.9rem;
+    color: #b8b8b8;
+    line-height: 1.4;
+}
+
+#instructions h4 {
+    font-size: 0.95rem;
+    margin-top: 0.75rem;
+}
+
+#instructions strong {
+    color: #ffd700;
 }
 
 /* Scrollbar styling */
