@@ -16,7 +16,13 @@ variables:
   appName: 'medieval-realms-game'
 
 steps:
-# Step 1: Copy game files to staging directory
+# Step 1: Setup Node.js 22
+- task: NodeTool@0
+  displayName: 'Setup Node.js 22'
+  inputs:
+    versionSpec: '22.x'
+
+# Step 2: Copy game files to staging directory
 - task: CopyFiles@2
   displayName: 'Copy Medieval Realms files'
   inputs:
@@ -25,7 +31,14 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)/medieval-realms'
     CleanTargetFolder: true
 
-# Step 2: Create web.config for proper routing
+# Step 3: Install npm dependencies
+- task: Npm@1
+  displayName: 'Install npm dependencies'
+  inputs:
+    command: 'install'
+    workingDir: '$(Build.ArtifactStagingDirectory)/medieval-realms'
+
+# Step 4: Create web.config for proper routing
 - task: Bash@3
   displayName: 'Create web.config for static site'
   inputs:
@@ -57,7 +70,7 @@ steps:
       </configuration>
       EOF
 
-# Step 3: Archive files for deployment
+# Step 5: Archive files for deployment
 - task: ArchiveFiles@2
   displayName: 'Archive Medieval Realms'
   inputs:
@@ -67,7 +80,7 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/medieval-realms.zip'
     replaceExistingArchive: true
 
-# Step 4: Publish artifact
+# Step 6: Publish artifact
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
   inputs:
@@ -75,7 +88,7 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
-# Step 5: Deploy to Azure App Service
+# Step 7: Deploy to Azure App Service
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
   inputs:
@@ -84,3 +97,4 @@ steps:
     appName: '$(appName)'
     package: '$(Build.ArtifactStagingDirectory)/medieval-realms.zip'
     deploymentMethod: 'zipDeploy'
+    runtimeStack: 'NODE|22-lts'
