@@ -13,7 +13,7 @@ pool:
 
 variables:
   # The name of your Azure App Service (you'll set this after creating the app)
-  appName: 'medieval-realms-game'
+  appName: 'medieval-realms'
 
 steps:
 # Step 1: Setup Node.js 22
