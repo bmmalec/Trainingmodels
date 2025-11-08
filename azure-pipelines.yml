@@ -1,0 +1,86 @@
+# Azure DevOps Pipeline for Medieval Realms
+# Deploys static website to Azure App Service
+
+trigger:
+  branches:
+    include:
+    - claude/azure-devops-git-access-011CUs6ygDxpnNW4n21ywzDu
+    - main
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # The name of your Azure App Service (you'll set this after creating the app)
+  appName: 'medieval-realms-game'
+
+steps:
+# Step 1: Copy game files to staging directory
+- task: CopyFiles@2
+  displayName: 'Copy Medieval Realms files'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/medieval-realms'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/medieval-realms'
+    CleanTargetFolder: true
+
+# Step 2: Create web.config for proper routing
+- task: Bash@3
+  displayName: 'Create web.config for static site'
+  inputs:
+    targetType: 'inline'
+    script: |
+      cat > $(Build.ArtifactStagingDirectory)/medieval-realms/web.config << 'EOF'
+      <?xml version="1.0" encoding="utf-8"?>
+      <configuration>
+        <system.webServer>
+          <staticContent>
+            <mimeMap fileExtension=".json" mimeType="application/json" />
+            <mimeMap fileExtension=".js" mimeType="application/javascript" />
+          </staticContent>
+          <rewrite>
+            <rules>
+              <rule name="Redirect to index.html" stopProcessing="true">
+                <match url="^$" />
+                <action type="Redirect" url="index.html" />
+              </rule>
+            </rules>
+          </rewrite>
+          <defaultDocument>
+            <files>
+              <clear />
+              <add value="index.html" />
+            </files>
+          </defaultDocument>
+        </system.webServer>
+      </configuration>
+      EOF
+
+# Step 3: Archive files for deployment
+- task: ArchiveFiles@2
+  displayName: 'Archive Medieval Realms'
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/medieval-realms'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/medieval-realms.zip'
+    replaceExistingArchive: true
+
+# Step 4: Publish artifact
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/medieval-realms.zip'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+# Step 5: Deploy to Azure App Service
+- task: AzureWebApp@1
+  displayName: 'Deploy to Azure App Service'
+  inputs:
+    azureSubscription: 'Azure-Service-Connection' # You'll create this service connection
+    appType: 'webAppLinux'
+    appName: '$(appName)'
+    package: '$(Build.ArtifactStagingDirectory)/medieval-realms.zip'
+    deploymentMethod: 'zipDeploy'
