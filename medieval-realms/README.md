@@ -9,6 +9,7 @@ A web-based medieval strategy game inspired by Lords of the Realm II, featuring 
 - **Resource Management**: Collect resources from controlled territories and manage your armies
 - **AI Opponents**: Play against 3 AI opponents with strategic decision-making
 - **Medieval Theming**: Authentic medieval-style territory names and game aesthetics
+- **Mobile Responsive**: Fully playable on smartphones and tablets with touch support
 
 ## How to Play
 
@@ -120,9 +121,17 @@ If attacker loses:
 
 ## Controls
 
+### Desktop
 - **Left Click**: Select territory / Attack enemy territory
+- **Mouse Hover**: Highlight territories
 - **End Turn Button**: Complete your turn and pass to next player
 - **New Game Button**: Start a fresh game with a new map
+
+### Mobile / Touch Devices
+- **Tap**: Select territory / Attack enemy territory
+- **Touch-Friendly Buttons**: Large, easy-to-tap buttons for game controls
+- **Responsive Layout**: Panels stack vertically for easy scrolling
+- **Auto-Scaling Canvas**: Map automatically adjusts to screen size
 
 ## AI Behavior
 
@@ -161,6 +170,28 @@ medieval-realms/
     ├── game.js         # Main game logic
     └── main.js         # Entry point
 ```
+
+## Mobile Support
+
+Medieval Realms is fully responsive and optimized for mobile devices:
+
+### Responsive Features
+- **Touch Controls**: Native touch event support for tap-to-select and tap-to-attack
+- **Responsive Canvas**: Game map scales automatically to fit any screen size
+- **Vertical Layout**: On mobile (<768px), panels stack vertically for easy scrolling
+- **Touch-Optimized UI**: Buttons are sized for comfortable thumb tapping (min 48px height)
+- **No Text Selection**: Prevents accidental text selection during gameplay on touch devices
+
+### Supported Screen Sizes
+- **Desktop**: Full three-panel layout (left sidebar, map, right sidebar)
+- **Tablet (≤1024px)**: Slightly reduced panel sizes for optimal viewing
+- **Mobile (≤768px)**: Vertical stacked layout (player info → map → rules)
+- **Small Mobile (≤480px)**: Compressed text and optimized spacing
+
+### Browser Compatibility
+- Chrome/Safari/Edge on iOS and Android
+- Modern mobile browsers with HTML5 Canvas support
+- Requires JavaScript enabled
 
 ## Deployment
 

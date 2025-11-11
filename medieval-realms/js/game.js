@@ -54,8 +54,18 @@ class Game {
 
     // Setup event listeners
     setupEventListeners() {
+        // Mouse events
         this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
         this.canvas.addEventListener('mousemove', (e) => this.handleCanvasHover(e));
+
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
+        // Window resize for responsive canvas
+        window.addEventListener('resize', () => this.handleResize());
+        this.handleResize(); // Initial sizing
     }
 
     // Handle canvas click
@@ -63,8 +73,11 @@ class Game {
         if (this.gameOver) return;
 
         const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // Scale coordinates to match canvas resolution
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         const clickedTerritory = this.getTerritoryAt(x, y);
         if (!clickedTerritory) return;
@@ -105,8 +118,11 @@ class Game {
     // Handle canvas hover
     handleCanvasHover(e) {
         const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // Scale coordinates to match canvas resolution
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         const hoveredTerritory = this.getTerritoryAt(x, y);
 
@@ -116,6 +132,81 @@ class Game {
             this.renderer.highlightHovered(hoveredTerritory);
         } else {
             this.canvas.style.cursor = 'default';
+        }
+    }
+
+    // Handle touch start
+    handleTouchStart(e) {
+        e.preventDefault();
+        this.touchStartTime = Date.now();
+        this.touchMoved = false;
+    }
+
+    // Handle touch move
+    handleTouchMove(e) {
+        e.preventDefault();
+        this.touchMoved = true;
+    }
+
+    // Handle touch end (treat as click if not moved)
+    handleTouchEnd(e) {
+        e.preventDefault();
+
+        // Only treat as tap if finger didn't move and was quick
+        if (!this.touchMoved && (Date.now() - this.touchStartTime) < 500) {
+            const touch = e.changedTouches[0];
+            const rect = this.canvas.getBoundingClientRect();
+
+            // Scale coordinates for canvas
+            const scaleX = this.canvas.width / rect.width;
+            const scaleY = this.canvas.height / rect.height;
+
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+
+            // Create a synthetic event for handleCanvasClick
+            const syntheticEvent = {
+                clientX: rect.left + x / scaleX,
+                clientY: rect.top + y / scaleY
+            };
+
+            this.handleCanvasClick(syntheticEvent);
+        }
+    }
+
+    // Handle window resize
+    handleResize() {
+        const container = this.canvas.parentElement;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+
+        // Calculate appropriate canvas size
+        const maxWidth = Math.min(containerWidth - 20, this.config.CANVAS_WIDTH);
+        const maxHeight = Math.min(containerHeight - 20, this.config.CANVAS_HEIGHT);
+
+        // Maintain aspect ratio
+        const aspectRatio = this.config.CANVAS_WIDTH / this.config.CANVAS_HEIGHT;
+        let newWidth = maxWidth;
+        let newHeight = maxWidth / aspectRatio;
+
+        if (newHeight > maxHeight) {
+            newHeight = maxHeight;
+            newWidth = maxHeight * aspectRatio;
+        }
+
+        // On mobile, use full width
+        if (window.innerWidth <= 768) {
+            newWidth = containerWidth - 10;
+            newHeight = newWidth / aspectRatio;
+        }
+
+        // Update canvas display size (CSS)
+        this.canvas.style.width = newWidth + 'px';
+        this.canvas.style.height = newHeight + 'px';
+
+        // Redraw if game is active
+        if (this.territories.length > 0) {
+            this.renderer.render(this.territories, this.selectedTerritory);
         }
     }
 
